@@ -17,10 +17,7 @@ mul (MyStr a) (MyStr b) = Right "Multiplication is undefined for str & str"
 
 sub :: Memory -> Memory -> Either Memory String
 sub (MyNum a) (MyNum b) = Left $ MyNum (a-b)
-sub (MyStr a) (MyStr b) = Right "No instance sub for str and str"
-sub (MyNum a) (MyStr b) = Right "No instance sub for int and str"
-sub (MyStr a) (MyNum b) = Right "No instance sub for str and int"
--- sub _ _ = Right "Cannot sub this and that"
+sub _ _ = Right "Can substract only integers"
 
 execute :: Command -> Stack -> Either Stack String
 execute Add rstack = if length rstack < 2 then Right "Not enough values on stack" else
