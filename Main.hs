@@ -11,9 +11,9 @@ add (MyStr a) (MyNum b) = Left $ MyStr (a<>show b)
 
 mul :: Memory -> Memory -> Either Memory String
 mul (MyNum a) (MyNum b) = Left $ MyNum (a*b)
-mul (MyStr a) (MyStr b) = Right "Multiplication is undefined for str & str"
 mul (MyNum a) (MyStr b) = Left $ MyStr (concat $ replicate (fromInteger a) b)
 mul (MyStr a) (MyNum b) = Left $ MyStr (concat $ replicate (fromInteger b) a)
+mul (MyStr a) (MyStr b) = Right "Multiplication is undefined for str & str"
 
 sub :: Memory -> Memory -> Either Memory String
 sub (MyNum a) (MyNum b) = Left $ MyNum (a-b)
