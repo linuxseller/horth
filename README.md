@@ -1,5 +1,7 @@
 # HORTH
 
+# DEVELOPMENT MOVED TO DARCS
+
 Stack based programming language written in haskell
 
 
