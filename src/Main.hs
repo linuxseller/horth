@@ -1,3 +1,4 @@
+module Main where
 data Command = Add | Sub | Mul | Swap | Print | Push Memory deriving Show
 data Memory = MyNum Integer | MyStr String deriving Show
 type Stack = [Memory]
@@ -21,17 +22,17 @@ sub _ _ = Right "Can substract only integers"
 
 execute :: Command -> Stack -> Either Stack String
 execute Add rstack = if length rstack < 2 then Right "Not enough values on stack" else
-                         case add (head rstack) (head $tail rstack) of
-                            Right err -> Right err
-                            Left x -> Left $ x : tail (tail rstack)
+                       case add (head rstack) (head $tail rstack) of
+                         Right err -> Right err
+                         Left x -> Left $ x : tail (tail rstack)
 execute Sub rstack = if length rstack < 2 then Right "Not enough values on stack" else
-                        case sub (head rstack) (head $tail rstack) of
-                            Right err -> Right err
-                            Left x -> Left (x : tail (tail rstack))
+                       case sub (head rstack) (head $tail rstack) of
+                         Right err -> Right err
+                         Left x -> Left (x : tail (tail rstack))
 execute Mul rstack = if length rstack < 2 then Right "Not enough values on stack" else
-                        case mul (head rstack) (head $tail rstack) of
-                            Right err -> Right err
-                            Left x -> Left (x : tail (tail rstack))
+                       case mul (head rstack) (head $tail rstack) of
+                         Right err -> Right err
+                         Left x -> Left (x : tail (tail rstack))
 execute Print rstack = undefined
 execute Swap rstack = Left $ head (tail rstack) : head rstack : tail (tail rstack)
 execute (Push val) rstack = Left $ val : rstack
