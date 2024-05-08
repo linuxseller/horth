@@ -8,10 +8,17 @@ data AstValue = AstNum Int | AstStr String deriving (Show, Eq)
 
 data AST
   = AstPush AstValue
+  | AstPop
   | AstAdd
+  | AstDup
   | AstSub
   | AstInc
   | AstDec
+  | AstMul
+  | AstPrint
+  | AstSwap
+  | AstWhile
+  | AstFi
   deriving (Show, Eq)
 
 newtype Parser a = Parser {runParser :: String -> Maybe (String, a)}
@@ -45,6 +52,24 @@ astInc = AstInc <$ stringP "inc"
 astDec :: Parser AST
 astDec = AstDec <$ stringP "dec"
 
+astMul :: Parser AST
+astMul = AstMul <$ stringP "mul"
+
+astSwap :: Parser AST
+astSwap = AstSwap <$ stringP "swap"
+
+astDup :: Parser AST
+astDup = AstDup <$ stringP "dup"
+
+astWhile :: Parser AST
+astWhile = AstWhile <$ stringP "while"
+
+astFi :: Parser AST
+astFi = AstFi <$ stringP "fi"
+
+astPop :: Parser AST
+astPop = AstPop <$ stringP "pop"
+
 astNum :: Parser AST
 astNum = (\dgs -> AstPush $ AstNum $ read dgs) <$> notNull (spanP isDigit)
 
@@ -57,7 +82,7 @@ ws = spanP isSpace
 sepBy :: Parser a -> Parser b -> Parser [b]
 sepBy sep element = undefined
 
-parseAst = astDec <|> astInc <|> astAdd <|> astSub <|> astNum -- <|> astStr
+parseAst = astDec <|> astInc <|> astAdd <|> astSub <|> astMul <|> astSwap <|> astNum <|> astDup <|> astWhile <|> astFi <|> astPop -- <|> astStr
 
 notNull :: Parser [a] -> Parser [a]
 notNull (Parser p) = Parser $ \input -> do
