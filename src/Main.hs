@@ -5,6 +5,7 @@ import Control.Applicative
 import Data.Maybe
 import Data.Memory
 import Data.Parser
+import Validator
 import Runner
 
 programToAst code = snd $ fromMaybe ("", []) $ runParser (many $ ws*>parseAst) code
@@ -15,4 +16,8 @@ main = do
   let prg = "5 while dup dec fi"
   let (rest, program) = fromMaybe ("", []) $ runParser (many $ ws*>parseAst) prg
   print program
-  print $ run program
+  let validationResult = validateRun program
+  case validationResult of
+    (Right a) -> print a
+    (Left a) -> print $ run program
+  -- print $ run program
