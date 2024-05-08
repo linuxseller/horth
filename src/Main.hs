@@ -4,6 +4,7 @@ import Parser
 import Control.Applicative
 import Data.Maybe
 import Data.Memory
+import Data.Parser
 import Runner
 
 programToAst code = snd $ fromMaybe ("", []) $ runParser (many $ ws*>parseAst) code

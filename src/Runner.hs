@@ -1,6 +1,7 @@
 module Runner where
 
 import Data.Memory
+import Data.Parser
 import Parser
 
 add :: Memory -> Memory -> Either Memory String
