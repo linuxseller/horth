@@ -3,6 +3,8 @@ module Main where
 import Parser
 import Control.Applicative
 import Data.Maybe
+import System.Environment
+
 import Data.Memory
 import Data.Parser
 import Validator
@@ -12,8 +14,8 @@ programToAst code = snd $ fromMaybe ("", []) $ runParser (many $ ws*>parseAst) c
 
 main :: IO ()
 main = do
-  -- prg <- readFile "program.horth"
-  let prg = "5 while dup dec fi"
+  args <- getArgs
+  prg <- readFile $ head args
   let (rest, program) = fromMaybe ("", []) $ runParser (many $ ws*>parseAst) prg
   print program
   let validationResult = validateRun program
