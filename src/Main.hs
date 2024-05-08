@@ -94,6 +94,8 @@ runH (x:xs) (Left stack) = runH xs (execute x stack)
 
 run commands = runH commands $ Left []
 
+programToAst code = snd $ fromMaybe ("", []) $ runParser (many $ ws*>parseAst) code
+
 main :: IO ()
 main = do
   -- prg <- readFile "program.horth"
