@@ -70,6 +70,9 @@ validCommand (AstPush (AstNum val)) stack = Left (SNum : stack)
 validCommand AstPop [] = Right "Stack empty: pop"
 validCommand AstPop stack = Left $ tail stack
 
+validCommand AstPrint [] = Right "Stack empty: print"
+validCommand AstPrint stack = Left $ tail stack
+
 validCommand AstWhile stack = Right "while cant be called"
 validCommand AstFi stack = Right "fi cant be called"
 

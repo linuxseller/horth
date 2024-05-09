@@ -33,6 +33,9 @@ astFi = AstFi <$ stringP "fi"
 astPop :: Parser AST
 astPop = AstPop <$ stringP "pop"
 
+astPrint :: Parser AST
+astPrint = AstPrint <$ stringP "print"
+
 astNum :: Parser AST
 astNum = (\dgs -> AstPush $ AstNum $ read dgs) <$> notNull (spanP isDigit)
 
@@ -45,7 +48,7 @@ ws = spanP isSpace
 sepBy :: Parser a -> Parser b -> Parser [b]
 sepBy sep element = undefined
 
-parseAst = astDec <|> astInc <|> astAdd <|> astSub <|> astMul <|> astSwap <|> astNum <|> astDup <|> astWhile <|> astFi <|> astPop -- <|> astStr
+parseAst = astDec <|> astInc <|> astAdd <|> astSub <|> astMul <|> astSwap <|> astNum <|> astDup <|> astWhile <|> astFi <|> astPop <|> astPrint -- <|> astStr
 
 notNull :: Parser [a] -> Parser [a]
 notNull (Parser p) = Parser $ \input -> do
