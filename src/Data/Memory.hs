@@ -6,4 +6,3 @@ type Stack = [Memory]
 instance Show Memory where
   show (MemNum a) = show a
   show (MemStr a) = a
-

@@ -13,6 +13,8 @@ import Compiler
 
 programToAst code = snd $ fromMaybe ("", []) $ runParser (many $ ws*>parseAst) code
 
+
+
 main :: IO ()
 main = do
   args <- getArgs
