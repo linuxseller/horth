@@ -4,60 +4,35 @@ import Data.Memory
 import Data.Parser
 import Parser
 
-add :: Memory -> Memory -> Either Memory String
-add (MemNum a) (MemNum b) = Left $ MemNum (a+b)
-add (MemStr a) (MemStr b) = Left $ MemStr (a<>b)
-add (MemNum a) (MemStr b) = Left $ MemStr (show a<>b)
-add (MemStr a) (MemNum b) = Left $ MemStr (a<>show b)
+add :: Memory -> Memory -> Memory
+add (MemNum a) (MemNum b) = MemNum (a+b)
+add (MemStr a) (MemStr b) = MemStr (a<>b)
+add (MemNum a) (MemStr b) = MemStr (show a<>b)
+add (MemStr a) (MemNum b) = MemStr (a<>show b)
 -- add _ _ = Right "Cannot add this and that"
 
-mul :: Memory -> Memory -> Either Memory String
-mul (MemNum a) (MemNum b) = Left $ MemNum (a*b)
-mul (MemNum a) (MemStr b) = Left $ MemStr (concat $ replicate a b)
-mul (MemStr a) (MemNum b) = Left $ MemStr (concat $ replicate b a)
-mul (MemStr a) (MemStr b) = Right "Multiplication is undefined for str & str"
+mul :: Memory -> Memory -> Memory
+mul (MemNum a) (MemNum b) = MemNum (a*b)
+mul (MemNum a) (MemStr b) = MemStr (concat $ replicate a b)
+mul (MemStr a) (MemNum b) = MemStr (concat $ replicate b a)
 
-sub :: Memory -> Memory -> Either Memory String
-sub (MemNum a) (MemNum b) = Left $ MemNum (a-b)
-sub _ _ = Right "Can substract only integers"
+sub :: Memory -> Memory -> Memory
+sub (MemNum a) (MemNum b) = MemNum (a-b)
 
-smallStackErr = Right "Not enough elements on stack"
-
-execute :: AST -> Stack -> Either Stack String
-execute AstAdd rstack = if length rstack < 2 then Right "Not enough values on stack" else
-                       case add (head rstack) (head $ tail rstack) of
-                         Right err -> Right err
-                         Left x -> Left $ x : tail (tail rstack)
-execute AstSub rstack = if length rstack < 2 then Right "Not enough values on stack" else
-                       case sub (head rstack) (head $ tail rstack) of
-                         Right err -> Right err
-                         Left x -> Left (x : tail (tail rstack))
-execute AstMul rstack = if length rstack < 2 then Right "Not enough values on stack" else
-                       case mul (head rstack) (head $ tail rstack) of
-                         Right err -> Right err
-                         Left x -> Left (x : tail (tail rstack))
-execute AstInc (x:xs) =
-  case x of
-    MemNum a -> Left $ (MemNum $ a+1) : xs
-    otherwise -> Right "Could not inc not num"
-
-execute AstDec (x:xs) =
-  case x of
-    MemNum a -> Left $ (MemNum $ a-1) : xs
-    otherwise -> Right "Could not dec not num"
-
-execute AstSwap rstack = if runnable rstack then Left $ (rstack !! 1) : (rstack !! 0) : tail (tail rstack) else smallStackErr
-  where runnable = \x -> length x >=2
-
-execute AstDup rstack = if runnable then Left (head rstack:head rstack:tail rstack) else smallStackErr
-  where runnable = not $ null rstack
-
-execute (AstPush (AstNum val)) rstack = Left $ (MemNum val) : rstack
-
-execute AstPop [] = Right "Stack empty for pop"
-execute AstPop (x:xs) = Left xs
-
-execute _ rstack = Left rstack
+execute :: AST -> Stack -> Stack
+execute AstAdd stack = x : tail (tail stack)
+  where x = add (head stack) (stack !! 1)
+execute AstSub stack = x : tail (tail stack)
+  where x = sub (head stack) (stack !! 1)
+execute AstMul stack = (x : tail (tail stack))
+  where x = mul (head stack) (stack !! 1)
+execute AstInc ((MemNum x):xs) = MemNum (succ x) : xs
+execute AstDec ((MemNum x):xs) = MemNum (pred x) : xs
+execute AstSwap stack = (stack !! 1) : (stack !! 0) : tail (tail stack)
+execute AstDup stack = head stack:head stack:tail stack
+execute (AstPush (AstNum val)) stack = (MemNum val) : stack
+execute AstPop (x:xs) = xs
+execute _ stack = stack
 
 
 splitOn :: Eq a => a -> [a] -> [a] -> ([a], [a])
@@ -66,25 +41,22 @@ splitOn elem pref (x:xs)
   | elem == x = (pref, xs)
   | otherwise = splitOn elem (pref++[x]) xs
 
-runLoop :: [AST] -> Either Stack String -> Either Stack String
-runLoop ast (Left stack) =
+runLoop :: [AST] -> Stack -> Stack
+runLoop ast stack =
   if value > 0 then
-    runLoop ast (runH ast $ Left stack)
-  else Left stack
+    runLoop ast (runH ast stack)
+  else stack
     where (MemNum value) = head stack
 
-runH :: [AST] -> Either Stack String -> Either Stack String
-runH [] (Right err) = Right err
-runH [x] (Right err) = Right err
-runH (AstWhile:xs) (Left stack) =
+runH :: [AST] -> Stack -> Stack
+runH (AstWhile:xs) stack =
   if value > 0 then
-    runH afterloop (runLoop loop (Left stack))
-  else runH afterloop $ Left stack
+    runH afterloop (runLoop loop stack)
+  else runH afterloop stack
     where (loop, afterloop) = splitOn AstFi [] xs
           (MemNum value) = head stack
-runH (x:xs) (Right err) = Right err
-runH [] (Left stack) = Left stack
-runH [x] (Left stack) = execute x stack
-runH (x:xs) (Left stack) = runH xs (execute x stack)
+runH [] stack = stack
+runH [x] stack = execute x stack
+runH (x:xs) stack = runH xs (execute x stack)
 
-run commands = runH commands $ Left []
+run commands = runH commands []
