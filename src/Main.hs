@@ -9,6 +9,7 @@ import Data.Memory
 import Data.Parser
 import Validator
 import Runner
+import Compiler
 
 programToAst code = snd $ fromMaybe ("", []) $ runParser (many $ ws*>parseAst) code
 
@@ -17,9 +18,9 @@ main = do
   args <- getArgs
   prg <- readFile $ head args
   let (rest, program) = fromMaybe ("", []) $ runParser (many $ ws*>parseAst) prg
-  print program
+  -- print program
   let validationResult = validateRun program
   case validationResult of
     (Right a) -> print a
-    (Left a) -> print $ run program
+    (Left a) -> putStrLn $ compile program
   -- print $ run program

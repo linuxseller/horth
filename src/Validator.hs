@@ -82,6 +82,7 @@ splitOn elem pref (x:xs)
 -- TODO: Fix loop checking
 validateRunLoop :: [AST] -> Either Stack String -> Either Stack String
 validateRunLoop ast (Left stack)
+  | null stack = Right "Not enough values on stack: while"
   | head stack == SNum = Left stack
   | otherwise = Right "Not int on top of stack when loop"
 
@@ -90,7 +91,8 @@ validateRunH [] (Right err) = Right err
 validateRunH [x] (Right err) = Right err
 -- TODO: Fix loop checking
 validateRunH (AstWhile:xs) (Left stack)
-  | not $ null stack && head stack == SNum = Left stack
+  | null stack = Right "Not enough values on stack: while"
+  | head stack == SNum = Left stack
   | otherwise = Right "Not int on top of stack when loop"
 validateRunH (x:xs) (Right err) = Right err
 validateRunH [] (Left stack) = Left stack
