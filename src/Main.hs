@@ -17,12 +17,13 @@ programToAst code = snd $ fromMaybe ("", []) $ runParser (many $ ws*>parseAst) c
 
 main :: IO ()
 main = do
-  args <- getArgs
-  prg <- readFile $ head args
+  [filename, "-t", mode] <- getArgs
+  prg <- readFile $ filename
   let (rest, program) = fromMaybe ("", []) $ runParser (many $ ws*>parseAst) prg
-  -- print program
   let validationResult = validateRun program
   case validationResult of
     (Right a) -> print a
-    (Left a) -> putStrLn $ compile program
-  -- print $ run program
+    _ ->
+      case mode of
+        "run" -> putStrLn $ show $ run program
+        "compile" -> putStrLn $ compile program
