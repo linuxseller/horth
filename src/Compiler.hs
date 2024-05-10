@@ -4,97 +4,97 @@ import Data.Memory
 import Data.Parser
 import Parser
 
-header =
-  ".text                \n\
-  \# print              \n\
-  \print:               \n\
-  \  popq %rcx          \n\
-  \  popq %rax          \n\
-  \  pushq %rcx         \n\
-  \  mov %rsp, %rbp     \n\
-  \  dec %rsp           \n\
-  \  movb $0x0A, (%rsp) \n\
-  \  jmp .p_loop_cond   \n\
-  \  .p_loop:           \n\
-  \    mov $10, %rbx    \n\
-  \    div %rbx         \n\
-  \    add $0x30, %dl   \n\
-  \    dec %rsp         \n\
-  \    mov %dl, (%rsp)  \n\
-  \  .p_loop_cond:      \n\
-  \    test %rax, %rax  \n\
-  \    jnz .p_loop      \n\
-  \  mov $1,   %rax     \n\
-  \  mov $1,   %rdi     \n\
-  \  mov %rsp, %rsi     \n\
-  \  mov %rbp, %rdx     \n\
-  \  sub %rsp, %rdx     \n\
-  \  syscall            \n\
-  \  mov %rbp, %rsp     \n\
-  \  ret                \n\
-  \#print               \n\
-  \.globl _start        \n\
-  \_start:\n"
+header = unlines [
+  ".text                "
+ ,"# print             "
+ ,"print:              "
+ ,"  popq %rcx         "
+ ,"  popq %rax         "
+ ,"  pushq %rcx        "
+ ,"  mov %rsp, %rbp    "
+ ,"  dec %rsp          "
+ ,"  movb $0x0A, (%rsp)"
+ ,"  jmp .p_loop_cond  "
+ ,"  .p_loop:          "
+ ,"    mov $10, %rbx   "
+ ,"    div %rbx        "
+ ,"    add $0x30, %dl  "
+ ,"    dec %rsp        "
+ ,"    mov %dl, (%rsp) "
+ ,"  .p_loop_cond:     "
+ ,"    test %rax, %rax "
+ ,"    jnz .p_loop     "
+ ,"  mov $1,   %rax    "
+ ,"  mov $1,   %rdi    "
+ ,"  mov %rsp, %rsi    "
+ ,"  mov %rbp, %rdx    "
+ ,"  sub %rsp, %rdx    "
+ ,"  syscall           "
+ ,"  mov %rbp, %rsp    "
+ ,"  ret               "
+ ,"#print              "
+ ,".globl _start       "
+ ,"_start:\n"]
 
-footer =
-  "movl $1, %eax\n\
-  \popq  %rbx   \n\
-  \int  $0x80   \n"
+footer = unlines [
+  "movl $1, %eax"
+ ,"popq  %rbx"
+ ,"int  $0x80\n"]
 
 compCommand :: AST -> String
-compCommand AstAdd =
-  "# add         \n\
- \popq %rax      \n\
- \popq %rbx      \n\
- \add %rbx, %rax \n\
- \push %rax\n"
+compCommand AstAdd = unlines [
+  "# add         "
+ ,"popq %rax     "
+ ,"popq %rbx     "
+ ,"add %rbx, %rax"
+ ,"push %rax\n"]
 
-compCommand AstSub =
-  "# sub         \n\
- \popq %rax      \n\
- \popq %rbx      \n\
- \sub %rbx, %rax \n\
- \push %rax\n"
+compCommand AstSub = unlines [
+  "# sub         "
+ ,"popq %rax      "
+ ,"popq %rbx      "
+ ,"sub %rbx, %rax "
+ ,"push %rax\n"]
 
-compCommand AstMul =
-  "# mul          \n\
- \popq %rax       \n\
- \popq %rbx       \n\
- \imul %rbx, %rax \n\
- \push %rax\n"
+compCommand AstMul = unlines [
+  "# mul          "
+ ,"popq %rax       "
+ ,"popq %rbx       "
+ ,"imul %rbx, %rax "
+ ,"push %rax\n"]
 
-compCommand AstInc =
-  "# inc        \n\
- \popq  %rax    \n\
- \inc   %rax    \n\
- \pushq %rax\n"
+compCommand AstInc = unlines [
+  "# inc        "
+ ,"popq  %rax    "
+ ,"inc   %rax    "
+ ,"pushq %rax\n"]
 
-compCommand AstDec =
-  "# dec        \n\
- \popq  %rax    \n\
- \dec   %rax    \n\
- \pushq %rax\n"
+compCommand AstDec = unlines [
+  "# dec        "
+ ,"popq  %rax    "
+ ,"dec   %rax    "
+ ,"pushq %rax\n"]
 
-compCommand AstSwap =
-  "# swap       \n\
-  \popq  %rax   \n\
- \popq  %rbx    \n\
- \pushq %rax    \n\
- \pushq %rbx\n"
+compCommand AstSwap = unlines [
+  "# swap       "
+  ,"popq  %rax   "
+ ,"popq  %rbx    "
+ ,"pushq %rax    "
+ ,"pushq %rbx\n"]
 
-compCommand AstDup =
-  "# dup       \n\
-  \popq  %rax  \n\
-  \pushq %rax  \n\
-  \pushq %rax\n"
+compCommand AstDup =unlines [
+  "# dup       "
+  ,"popq  %rax  "
+  ,"pushq %rax  "
+  ,"pushq %rax\n"]
 
-compCommand (AstPush (AstNum val)) =
-  "# push                   \n\
-  \pushq $" <> show val <> "\n"
+compCommand (AstPush (AstNum val)) = unlines [
+  "# push                   "
+  ,"pushq $" <> show val <> "\n"]
 
-compCommand AstPop =
-  "# pop    \n\
-  \popq %rax\n"
+compCommand AstPop = unlines [
+  "# pop"
+  ,"popq %rax,\n"]
 
 compCommand AstPrint = "call print\n"
 compCommand _ = ""
@@ -106,10 +106,13 @@ splitOn elem pref (x:xs)
   | otherwise = splitOn elem (pref++[x]) xs
 
 compileLoop :: [AST] -> String
-compileLoop ast =
-  ".loop:\n" ++ (compileH ast) ++ ".check_loop:\n\
- \test %rax, %rax\n\
- \jnz .loop\n"
+compileLoop ast = unlines {
+  ".loop:\n"
+ ,(compileH ast)
+ ,".check_loop:"
+ ,"test %rax, %rax"
+ ,"jnz .loop\n"
+]
 
 compileH :: [AST] -> String
 compileH [] = ""
