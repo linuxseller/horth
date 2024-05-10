@@ -38,6 +38,7 @@ main = do
   let outfile = getOutfile args
   prg <- readFile $ filename
   let (rest, program) = fromMaybe ("", []) $ runParser (many $ ws*>parseAst) prg
+  putStrLn $ "parsed program: " <> show program
   let validationResult = validateRun program
   putStrLn "Validating..."
   case validationResult of
@@ -46,7 +47,9 @@ main = do
       exitWith $ ExitFailure 1
     _ -> putStrLn "Validation: success"
   case mode of
-    "run" -> putStrLn $ show $ run program
+    "run" -> do
+      putStrLn "Running..."
+      putStrLn $ show $ run program
     "compile" -> do
       writeFile (outfile <> ".asm") $ compile program
       putStrLn "Compiling..."

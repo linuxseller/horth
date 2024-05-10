@@ -1,11 +1,3 @@
--- .text
--- .globl _start
--- _start:
---     pushq $69
---     movl $1, %eax
---     popq  %rbx
---     int  $0x80
-
 module Compiler where
 
 import Data.Memory
@@ -106,7 +98,6 @@ compCommand AstPop =
 
 compCommand AstPrint = "call print\n"
 compCommand _ = ""
-
 
 splitOn :: Eq a => a -> [a] -> [a] -> ([a], [a])
 splitOn _ _ [] = ([],[])
