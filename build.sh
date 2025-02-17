@@ -1,6 +1,5 @@
 #!/bin/env bash
 set -xe
-
 SRC_FILES="./src/Main.hs ./src/Parser.hs ./src/Runner.hs ./src/Data/Memory.hs ./src/Data/Parser.hs ./src/Compiler.hs"
 
 ghc $SRC_FILES -isrc/Data -isrc -outputdir ./build -o ./build/horth.o
